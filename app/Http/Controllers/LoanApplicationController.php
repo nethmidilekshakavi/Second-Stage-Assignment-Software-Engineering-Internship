@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\LoanApplication;
+use Illuminate\Support\Facades\Storage;
 
 class LoanApplicationController extends Controller
 {
     // Show Loan Form
     public function create()
     {
-        return view('loan.apply'); // resources/views/loan/apply.blade.php
+        return view('loan.apply');
     }
 
     // Store Loan Application
@@ -22,7 +23,7 @@ class LoanApplicationController extends Controller
             'tel' => 'required|string|max:15',
             'occupation' => 'required|string|max:255',
             'salary' => 'required|numeric|min:0',
-            'paysheet_uri' => 'nullable|mimes:pdf|max:2048',
+            'paysheet_uri' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
         $filePath = null;
@@ -43,10 +44,60 @@ class LoanApplicationController extends Controller
         return redirect()->back()->with('success', 'Loan application submitted successfully!');
     }
 
-    // Optional: List all loans
+    // List all loans
     public function index()
     {
         $loans = LoanApplication::all();
         return view('dashboard', compact('loans'));
+    }
+
+    // View PDF file
+    public function viewPdf($id)
+    {
+        $loan = LoanApplication::findOrFail($id);
+        
+        if (!$loan->paysheet_uri) {
+            abort(404, 'File not found');
+        }
+
+        $filePath = storage_path('app/public/' . $loan->paysheet_uri);
+        
+        if (!file_exists($filePath)) {
+            abort(404, 'File not found');
+        }
+
+        return response()->file($filePath, [
+            'Content-Type' => 'application/pdf',
+        ]);
+    }
+
+    // Download PDF file
+    public function downloadPdf($id)
+    {
+        $loan = LoanApplication::findOrFail($id);
+        
+        if (!$loan->paysheet_uri) {
+            abort(404, 'File not found');
+        }
+
+        return Storage::disk('public')->download($loan->paysheet_uri);
+    }
+
+    // Approve loan
+    public function approve($id)
+    {
+        $loan = LoanApplication::findOrFail($id);
+        $loan->update(['status' => 'approved']);
+        
+        return redirect()->back()->with('success', 'Loan application approved!');
+    }
+
+    // Reject loan
+    public function reject($id)
+    {
+        $loan = LoanApplication::findOrFail($id);
+        $loan->update(['status' => 'rejected']);
+        
+        return redirect()->back()->with('success', 'Loan application rejected!');
     }
 }

@@ -65,3 +65,7 @@ Route::post('/loan/apply', [LoanApplicationController::class, 'store'])->name('l
 
 // Optional: View all applications (if needed)
 Route::get('/loan/list', [LoanApplicationController::class, 'index'])->name('loan.index');
+Route::get('/loan/approve/{id}', [LoanApplicationController::class, 'approve']);
+Route::get('/loan/reject/{id}', [LoanApplicationController::class, 'reject']);
+Route::get('/loan/view-pdf/{id}', [LoanApplicationController::class, 'viewPdf']);
+Route::get('/loan/download-pdf/{id}', [LoanApplicationController::class, 'downloadPdf']);
