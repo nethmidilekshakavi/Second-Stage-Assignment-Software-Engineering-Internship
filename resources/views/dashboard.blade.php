@@ -28,7 +28,6 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Loan ID</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Tel</th>
@@ -40,24 +39,24 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($loans as $loan)
-                    <tr>
-                        <td>{{ $loan->id }}</td>
-                        <td>{{ $loan->loan_id }}</td>
-                        <td>{{ $loan->name }}</td>
-                        <td>{{ $loan->email }}</td>
-                        <td>{{ $loan->tel }}</td>
-                        <td>{{ $loan->occupation }}</td>
-                        <td>{{ $loan->salary }}</td>
-                        <td>{{ $loan->status }}</td>
-                        <td>{{ $loan->submitted_at }}</td>
-                        <td>
-                            <a href="{{ url('/loan/approve/'.$loan->id) }}" class="btn btn-success btn-sm">Approve</a>
-                            <a href="{{ url('/loan/reject/'.$loan->id) }}" class="btn btn-danger btn-sm">Reject</a>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
+    @foreach($loans as $loan)
+        <tr>
+            <td>{{ $loan->id }}</td>
+            <td>{{ $loan->name }}</td>
+            <td>{{ $loan->email }}</td>
+            <td>{{ $loan->tel }}</td>
+            <td>{{ $loan->occupation }}</td>
+            <td>{{ $loan->salary }}</td>
+            <td>{{ $loan->status }}</td>
+            <td>{{ $loan->created_at->timezone('Asia/Colombo')->format('Y-m-d H:i:s') }}</td>
+            <td>
+                <a href="{{ url('/loan/approve/'.$loan->id) }}" class="btn btn-success btn-sm">Approve</a>
+                <a href="{{ url('/loan/reject/'.$loan->id) }}" class="btn btn-danger btn-sm">Reject</a>
+            </td>
+        </tr>
+    @endforeach
+</tbody>
+
         </table>
 
     </div>
