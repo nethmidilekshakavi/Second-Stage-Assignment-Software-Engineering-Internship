@@ -20,18 +20,30 @@
                                 {{ $errors->first() }}
                             </div>
                         @endif
+
                         <form action="{{ url('/login') }}" method="POST">
                             @csrf
                             <div class="mb-3">
                                 <label for="username" class="form-label">Username</label>
                                 <input type="text" name="username" id="username" class="form-control" required>
                             </div>
+
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
                                 <input type="password" name="password" id="password" class="form-control" required>
                             </div>
+
                             <button type="submit" class="btn btn-primary w-100">Login</button>
                         </form>
+
+                        <!-- 🚀 Loan Application Button -->
+                        <div class="mt-3 text-center">
+    <a href="{{ route('loan.apply') }}" class="btn btn-outline-secondary w-100">
+        Go to Loan Application Form
+    </a>
+</div>
+
+
                     </div>
                 </div>
             </div>

@@ -3,7 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Middleware\ManagerAuth;
+use App\Http\Controllers\LoanApplicationController;
 
+// -------------------------
+// Manager Login Routes
+// -------------------------
 Route::get('/login', function () {
     return view('login');
 })->name('login');
@@ -18,30 +22,46 @@ Route::post('/login', function(Request $request){
     } else {
         return back()->withErrors(['Invalid credentials']);
     }
-});
+})->name('login.submit');
 
+// -------------------------
+// Protected Manager Routes
+// -------------------------
 Route::middleware([ManagerAuth::class])->group(function () {
+
+    // Dashboard
     Route::get('/dashboard', function(){
         $loans = \App\Models\LoanApplication::all();
         return view('dashboard', compact('loans'));
-    });
+    })->name('dashboard');
 
+    // Approve / Reject Loan
     Route::get('/loan/approve/{id}', function($id){
         $loan = \App\Models\LoanApplication::findOrFail($id);
         $loan->status = 'approved';
         $loan->save();
-        return redirect('/dashboard');
+        return redirect()->back();
     });
 
     Route::get('/loan/reject/{id}', function($id){
         $loan = \App\Models\LoanApplication::findOrFail($id);
         $loan->status = 'rejected';
         $loan->save();
-        return redirect('/dashboard');
+        return redirect()->back();
     });
 
+    // Logout
     Route::get('/logout', function(){
         session()->forget('manager_logged_in');
         return redirect('/login');
     });
 });
+
+// -------------------------
+// Loan Application Web Routes
+// -------------------------
+Route::get('/loan/apply', [LoanApplicationController::class, 'create'])->name('loan.apply');
+Route::post('/loan/apply', [LoanApplicationController::class, 'store'])->name('loan.store');
+
+// Optional: View all applications (if needed)
+Route::get('/loan/list', [LoanApplicationController::class, 'index'])->name('loan.index');
