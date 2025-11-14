@@ -52,8 +52,22 @@
                         <td>{{ $loan->status }}</td>
                         <td>{{ $loan->submitted_at }}</td>
                         <td>
+                            <!-- Approve / Reject -->
                             <a href="{{ url('/loan/approve/'.$loan->id) }}" class="btn btn-success btn-sm">Approve</a>
                             <a href="{{ url('/loan/reject/'.$loan->id) }}" class="btn btn-danger btn-sm">Reject</a>
+
+                            <!-- Edit -->
+                            <a href="{{ url('/loan/edit/'.$loan->id) }}" class="btn btn-primary btn-sm">Edit</a>
+
+                            <!-- Delete -->
+                            <form action="{{ url('/loan/delete/'.$loan->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-warning btn-sm"
+                                    onclick="return confirm('Are you sure you want to delete this loan?');">
+                                    Delete
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 @endforeach

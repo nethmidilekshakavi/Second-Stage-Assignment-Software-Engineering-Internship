@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('occupation');
             $table->decimal('salary', 10, 2);
             $table->string('paysheet_uri')->nullable();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $table->timestamp('submitted_at')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
