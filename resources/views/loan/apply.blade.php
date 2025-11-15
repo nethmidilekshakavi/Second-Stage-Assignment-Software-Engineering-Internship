@@ -6,6 +6,7 @@
     <title>Loan Application Form</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * {
             margin: 0;
@@ -762,7 +763,7 @@
 
                 <!-- Action Buttons -->
                 <div class="button-group">
-                    <a href="{{ url('/login') }}" class="btn-back">
+                    <a href="{{ url('/') }}" class="btn-back">
                         <i class="fas fa-arrow-left"></i> Back to Home
                     </a>
                     
@@ -801,5 +802,23 @@
             });
         });
     </script>
+    <script>
+@if(session('success'))
+    Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: "{{ session('success') }}",
+        confirmButtonColor: '#3085d6',
+    });
+@endif
+
+@if(session('error'))
+    Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: "{{ session('error') }}",
+    });
+@endif
+</script>
 </body>
 </html>
