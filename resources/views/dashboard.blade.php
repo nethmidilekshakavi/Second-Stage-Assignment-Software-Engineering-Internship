@@ -6,6 +6,8 @@
     <title>Manager Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         * {
             margin: 0;
@@ -688,11 +690,20 @@
                                                 <i class="fas fa-times"></i> Reject
                                             </a>
                                            <a href="{{ route('loan.edit', $loan->id) }}" class="btn btn-warning btn-sm">
-    <i class="fas fa-edit"></i> Edit
-</a>
-                                            <a href="{{ url('/loan/delete/'.$loan->id) }}" class="btn btn-info btn-sm" onclick="return confirm('Are you sure you want to delete this application?')">
-                                                <i class="fas fa-trash"></i> Delete
+                                            <i class="fas fa-edit"></i> Edit
                                             </a>
+                                            <a href="javascript:void(0)" 
+   onclick="confirmDelete({{ $loan->id }})" 
+   class="btn btn-info btn-sm">
+   <i class="fas fa-trash"></i> Delete
+</a>
+
+<!-- Hidden form for deletion -->
+<form id="delete-form-{{ $loan->id }}" action="{{ route('loan.delete', $loan->id) }}" method="POST" style="display:none;">
+    @csrf
+    @method('DELETE')
+</form>
+
                                         </div>
                                     </td>
                                 </tr>
@@ -741,5 +752,26 @@
             }
         });
     </script>
+    
+
+    <script>
+    function confirmDelete(id) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "This application will be permanently deleted!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "Cancel"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-form-' + id).submit();
+            }
+        });
+    }
+</script>
+
+
+
 </body>
 </html>
