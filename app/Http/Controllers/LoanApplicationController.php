@@ -65,14 +65,6 @@ class LoanApplicationController extends Controller
         return redirect()->back()->with('success', 'Loan application submitted successfully!');
     }
 
-    // List all loans
-    public function index()
-    {
-        // Consider scoping to the current user for non-admins (not implemented here)
-        $loans = LoanApplication::all();
-        return view('dashboard', compact('loans'));
-    }
-
     // View PDF file
     public function viewPdf($id)
     {
@@ -175,5 +167,20 @@ class LoanApplicationController extends Controller
         $loan->delete();
 
         return redirect()->back()->with('success', 'Loan application deleted successfully!');
+    }
+
+
+
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+
+        // If you want admins to see all applications, add role check here.
+        // For now only the logged-in user's loans:
+        $loans = LoanApplication::where('user_id', $user->id)
+            ->latest()
+            ->paginate(9); // 9 cards per page
+
+        return view('loan.index', compact('loans'));
     }
 }

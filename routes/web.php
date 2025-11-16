@@ -76,14 +76,26 @@ Route::middleware([ManagerAuth::class])->group(function () {
 // LOAN APPLICATION ROUTES
 // --------------------------------------
 Route::middleware(['auth'])->group(function () {
-    Route::get('/loan/apply', [LoanApplicationController::class, 'create'])->name('loan.apply');
-    Route::post('/loan/apply', [LoanApplicationController::class, 'store'])->name('loan.store');
+    // list page (you requested /loan/list in the request)
     Route::get('/loan/list', [LoanApplicationController::class, 'index'])->name('loan.index');
-    Route::get('/loan/{id}/edit', [LoanApplicationController::class, 'edit'])->name('loan.edit');
-    Route::put('/loan/{id}/update', [LoanApplicationController::class, 'update'])->name('loan.update');
-    Route::delete('/loan/{id}/delete', [LoanApplicationController::class, 'destroy'])->name('loan.delete');
-});
 
+    // apply form + store
+    Route::get('/loan/apply', [LoanApplicationController::class, 'create'])->name('loan.apply');
+    Route::post('/loan', [LoanApplicationController::class, 'store'])->name('loan.store');
+
+    // view / download paysheet (named routes used in the blade)
+    Route::get('/loan/{id}/view', [LoanApplicationController::class, 'viewPdf'])->name('loan.view');
+    Route::get('/loan/{id}/download', [LoanApplicationController::class, 'downloadPdf'])->name('loan.download');
+
+    // edit / update / delete (if you have these methods)
+    Route::get('/loan/{id}/edit', [LoanApplicationController::class, 'edit'])->name('loan.edit');
+    Route::put('/loan/{id}', [LoanApplicationController::class, 'update'])->name('loan.update');
+    Route::delete('/loan/{id}', [LoanApplicationController::class, 'destroy'])->name('loan.destroy');
+
+    // admin actions (optional - protect with policies/middleware)
+    Route::post('/loan/{id}/approve', [LoanApplicationController::class, 'approve'])->name('loan.approve');
+    Route::post('/loan/{id}/reject', [LoanApplicationController::class, 'reject'])->name('loan.reject');
+});
 // Public PDF routes
 Route::get('/loan/view-pdf/{id}', [LoanApplicationController::class, 'viewPdf'])->name('loan.pdf.view');
 Route::get('/loan/download-pdf/{id}', [LoanApplicationController::class, 'downloadPdf'])->name('loan.pdf.download');
@@ -96,3 +108,4 @@ Route::get('/loan/reject/{id}', [LoanApplicationController::class, 'reject']);
 Route::get('/loan/view-pdf/{id}', [LoanApplicationController::class, 'viewPdf']);
 Route::get('/loan/download-pdf/{id}', [LoanApplicationController::class, 'downloadPdf']);
 
+// My Applications - only show loans of the authenticated user
