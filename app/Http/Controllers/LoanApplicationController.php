@@ -103,61 +103,61 @@ class LoanApplicationController extends Controller
 
 
 // Update Loan Application
-public function edit($id)
-{
-    $loan = LoanApplication::findOrFail($id);
-    return view('loan.edit', compact('loan'));
-}
+    public function edit($id)
+    {
+        $loan = LoanApplication::findOrFail($id);
+        return view('loan.edit', compact('loan'));
+    }
 
-public function update(Request $request, $id)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|max:255',
-        'tel' => 'required|string|max:15',
-        'occupation' => 'required|string|max:255',
-        'salary' => 'required|numeric|min:0',
-        'paysheet_uri' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
-    ]);
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'tel' => 'required|string|max:15',
+            'occupation' => 'required|string|max:255',
+            'salary' => 'required|numeric|min:0',
+            'paysheet_uri' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
+        ]);
 
-    $loan = LoanApplication::findOrFail($id);
+        $loan = LoanApplication::findOrFail($id);
 
-    // If new file uploaded → delete old one
-    if ($request->hasFile('paysheet_uri')) {
+        // If new file uploaded → delete old one
+        if ($request->hasFile('paysheet_uri')) {
+            if ($loan->paysheet_uri && Storage::disk('public')->exists($loan->paysheet_uri)) {
+                Storage::disk('public')->delete($loan->paysheet_uri);
+            }
+            $filePath = $request->file('paysheet_uri')->store('paysheets', 'public');
+        } else {
+            $filePath = $loan->paysheet_uri;
+        }
+
+        $loan->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'tel' => $request->tel,
+            'occupation' => $request->occupation,
+            'salary' => $request->salary,
+            'paysheet_uri' => $filePath,
+        ]);
+
+        return redirect()->back()->with('success', 'Loan application updated successfully!');
+    }
+
+//delete loan
+    public function destroy($id)
+    {
+        $loan = LoanApplication::findOrFail($id);
+
+        // Delete attached PDF or image
         if ($loan->paysheet_uri && Storage::disk('public')->exists($loan->paysheet_uri)) {
             Storage::disk('public')->delete($loan->paysheet_uri);
         }
-        $filePath = $request->file('paysheet_uri')->store('paysheets', 'public');
-    } else {
-        $filePath = $loan->paysheet_uri;
+
+        $loan->delete();
+
+        return redirect()->back()->with('success', 'Loan application deleted successfully!');
     }
-
-    $loan->update([
-        'name' => $request->name,
-        'email' => $request->email,
-        'tel' => $request->tel,
-        'occupation' => $request->occupation,
-        'salary' => $request->salary,
-        'paysheet_uri' => $filePath,
-    ]);
-
-    return redirect()->back()->with('success', 'Loan application updated successfully!');
-}
-
-//delete loan
-public function destroy($id)
-{
-    $loan = LoanApplication::findOrFail($id);
-
-    // Delete attached PDF or image
-    if ($loan->paysheet_uri && Storage::disk('public')->exists($loan->paysheet_uri)) {
-        Storage::disk('public')->delete($loan->paysheet_uri);
-    }
-
-    $loan->delete();
-
-    return redirect()->back()->with('success', 'Loan application deleted successfully!');
-}
 
 
 

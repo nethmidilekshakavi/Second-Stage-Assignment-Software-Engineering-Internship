@@ -631,11 +631,11 @@
                             </label>
                             <div class="input-wrapper">
                                 <i class="fas fa-user input-icon"></i>
-                                <input 
-                                    type="text" 
-                                    name="name" 
-                                    id="name" 
-                                    class="form-control" 
+                                <input
+                                    type="text"
+                                    name="name"
+                                    id="name"
+                                    class="form-control"
                                     placeholder="Enter your full name"
                                     value="{{ old('name') }}"
                                     required
@@ -651,11 +651,11 @@
                             </label>
                             <div class="input-wrapper">
                                 <i class="fas fa-envelope input-icon"></i>
-                                <input 
-                                    type="email" 
-                                    name="email" 
-                                    id="email" 
-                                    class="form-control" 
+                                <input
+                                    type="email"
+                                    name="email"
+                                    id="email"
+                                    class="form-control"
                                     placeholder="your.email@example.com"
                                     value="{{ old('email') }}"
                                     required
@@ -669,11 +669,11 @@
                             </label>
                             <div class="input-wrapper">
                                 <i class="fas fa-phone input-icon"></i>
-                                <input 
-                                    type="text" 
-                                    name="tel" 
-                                    id="tel" 
-                                    class="form-control" 
+                                <input
+                                    type="text"
+                                    name="tel"
+                                    id="tel"
+                                    class="form-control"
                                     placeholder="+94 XX XXX XXXX"
                                     value="{{ old('tel') }}"
                                     required
@@ -697,11 +697,11 @@
                             </label>
                             <div class="input-wrapper">
                                 <i class="fas fa-briefcase input-icon"></i>
-                                <input 
-                                    type="text" 
-                                    name="occupation" 
-                                    id="occupation" 
-                                    class="form-control" 
+                                <input
+                                    type="text"
+                                    name="occupation"
+                                    id="occupation"
+                                    class="form-control"
                                     placeholder="e.g. Software Engineer"
                                     value="{{ old('occupation') }}"
                                     required
@@ -715,11 +715,11 @@
                             </label>
                             <div class="input-wrapper">
                                 <i class="fas fa-rupee-sign input-icon"></i>
-                                <input 
-                                    type="number" 
-                                    name="salary" 
-                                    id="salary" 
-                                    class="form-control" 
+                                <input
+                                    type="number"
+                                    name="salary"
+                                    id="salary"
+                                    class="form-control"
                                     placeholder="e.g. 50000"
                                     value="{{ old('salary') }}"
                                     min="0"
@@ -742,10 +742,10 @@
                             <i class="fas fa-file-pdf"></i> Paysheet Document (PDF)
                         </label>
                         <div class="file-upload-wrapper">
-                            <input 
-                                type="file" 
-                                name="paysheet_uri" 
-                                id="paysheet_uri" 
+                            <input
+                                type="file"
+                                name="paysheet_uri"
+                                id="paysheet_uri"
                                 accept="application/pdf"
                                 onchange="updateFileName(this)"
                             >
@@ -766,7 +766,7 @@
                     <a href="{{ url('/') }}" class="btn-back">
                         <i class="fas fa-arrow-left"></i> Back to Home
                     </a>
-                    
+
                     <button type="submit" class="btn-submit">
                         <i class="fas fa-paper-plane"></i> Submit Application
                     </button>
@@ -794,7 +794,7 @@
                 section.style.opacity = '0';
                 section.style.transform = 'translateY(20px)';
                 section.style.transition = 'all 0.5s ease';
-                
+
                 setTimeout(() => {
                     section.style.opacity = '1';
                     section.style.transform = 'translateY(0)';

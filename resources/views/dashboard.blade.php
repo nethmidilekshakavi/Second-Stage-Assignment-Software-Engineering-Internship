@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Manager Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
     <style>
         * {
@@ -107,6 +109,7 @@
             text-decoration: none;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .nav-link::before {
@@ -197,6 +200,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
         }
 
         .btn-logout:hover {
@@ -218,6 +222,14 @@
             width: calc(100% - 280px);
         }
 
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block !important;
+        }
+
         .top-bar {
             background: white;
             padding: 20px 30px;
@@ -227,6 +239,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .top-bar h2 {
@@ -265,19 +279,135 @@
             font-size: 1.1rem;
         }
 
-        .alert {
-            border-radius: 12px;
-            border: none;
-            padding: 15px 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            margin-bottom: 20px;
-            animation: slideIn 0.5s ease;
+        /* Dashboard Overview Cards */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
-        @keyframes slideIn {
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+            border-left: 5px solid;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-card.total {
+            border-color: #2a5298;
+        }
+
+        .stat-card.pending {
+            border-color: #ffc107;
+        }
+
+        .stat-card.approved {
+            border-color: #28a745;
+        }
+
+        .stat-card.rejected {
+            border-color: #dc3545;
+        }
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .stat-card.total .stat-icon {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: #2a5298;
+        }
+
+        .stat-card.pending .stat-icon {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            color: #f57c00;
+        }
+
+        .stat-card.approved .stat-icon {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            color: #388e3c;
+        }
+
+        .stat-card.rejected .stat-icon {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            color: #d32f2f;
+        }
+
+        .stat-details h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 0 5px 0;
+            color: #212529;
+        }
+
+        .stat-details p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .chart-card h4 {
+            color: #1e3c72;
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        /* Application Cards */
+        .applications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .application-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(-20px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
@@ -285,143 +415,278 @@
             }
         }
 
-        .alert-success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
+        .application-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 30px rgba(30, 60, 114, 0.2);
+            border-color: #2a5298;
         }
 
-        .card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
-            border: none;
+        .card-header-custom {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 18px 16px;
+            position: relative;
             overflow: hidden;
         }
 
-        .table-responsive {
-            overflow-x: auto;
+        .card-header-custom::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -15px;
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
         }
 
-        .table {
-            margin: 0;
-            white-space: nowrap;
-        }
-
-        .table thead {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-        }
-
-        .table thead th {
-            color: white;
-            font-weight: 600;
-            padding: 16px 12px;
-            border: none;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .table tbody tr {
-            transition: all 0.2s ease;
-        }
-
-        .table tbody tr:hover {
-            background: #f8f9fa;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .table tbody td {
-            padding: 14px 12px;
-            vertical-align: middle;
-            border-bottom: 1px solid #e9ecef;
-            font-size: 0.9rem;
-        }
-
-        .badge {
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            display: inline-flex;
+        .applicant-header {
+            display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
         }
 
-        .bg-warning {
-            background: #ffc107 !important;
+        .applicant-image-wrapper {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .applicant-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .applicant-image:hover {
+            transform: scale(1.15);
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .status-badge-overlay {
+            position: absolute;
+            bottom: -3px;
+            right: -3px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            font-size: 0.65rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-badge-overlay.pending {
+            background: #ffc107;
             color: #000;
         }
 
-        .bg-success {
-            background: #28a745 !important;
+        .status-badge-overlay.approved {
+            background: #28a745;
+            color: white;
         }
 
-        .bg-danger {
-            background: #dc3545 !important;
+        .status-badge-overlay.rejected {
+            background: #dc3545;
+            color: white;
+        }
+
+        .applicant-info {
+            flex: 1;
+            color: white;
+            min-width: 0;
+        }
+
+        .applicant-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .applicant-id {
+            font-size: 0.75rem;
+            opacity: 0.85;
+            margin: 0 0 6px 0;
+        }
+
+        .applicant-occupation {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-body-custom {
+            padding: 16px;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+
+        .info-icon.email {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: #1976d2;
+        }
+
+        .info-icon.phone {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            color: #388e3c;
+        }
+
+        .info-icon.salary {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            color: #f57c00;
+        }
+
+        .info-icon.document {
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+            color: #c2185b;
+        }
+
+        .info-icon.date {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            color: #7b1fa2;
+        }
+
+        .info-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .info-label {
+            font-size: 0.7rem;
+            color: #6c757d;
+            margin: 0 0 2px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-size: 0.9rem;
+            color: #212529;
+            margin: 0;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .info-value.highlight {
+            color: #1e3c72;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .card-actions {
+            padding: 14px 16px;
+            background: #f8f9fa;
+            border-top: 2px solid #e9ecef;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
         }
 
         .btn {
-            padding: 7px 12px;
+            padding: 8px 12px;
             border-radius: 8px;
             font-weight: 600;
             font-size: 0.8rem;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             border: none;
             display: inline-flex;
             align-items: center;
             gap: 5px;
             text-decoration: none;
             white-space: nowrap;
+            justify-content: center;
         }
 
         .btn-success {
-            background: #28a745;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
         }
 
         .btn-success:hover {
-            background: #218838;
+            background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
         }
 
         .btn-danger {
-            background: #dc3545;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
             color: white;
         }
 
         .btn-danger:hover {
-            background: #c82333;
+            background: linear-gradient(135deg, #c82333 0%, #dc3545 100%);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
         }
 
         .btn-warning {
-            background: #ffc107;
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
             color: #000;
         }
 
         .btn-warning:hover {
-            background: #e0a800;
+            background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
         }
 
         .btn-info {
-            background: #17a2b8;
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
             color: white;
         }
 
         .btn-info:hover {
-            background: #138496;
+            background: linear-gradient(135deg, #138496 0%, #17a2b8 100%);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+            box-shadow: 0 4px 12px rgba(23, 162, 184, 0.4);
         }
 
         .btn-outline-primary {
             border: 2px solid #2a5298;
             color: #2a5298;
             background: white;
+            padding: 5px 10px;
+            font-size: 0.75rem;
         }
 
         .btn-outline-primary:hover {
@@ -433,6 +698,8 @@
             border: 2px solid #6c757d;
             color: #6c757d;
             background: white;
+            padding: 5px 10px;
+            font-size: 0.75rem;
         }
 
         .btn-outline-secondary:hover {
@@ -440,28 +707,111 @@
             color: white;
         }
 
-        .btn-group {
+        .document-links {
             display: flex;
-            gap: 4px;
+            gap: 6px;
+            margin-top: 6px;
         }
 
-        .action-btns {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
+        .document-links .btn {
+            flex: 1;
         }
 
         .no-results {
             text-align: center;
-            padding: 50px 20px;
+            padding: 60px 20px;
             color: #6c757d;
             display: none;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
         }
 
         .no-results i {
             font-size: 3.5rem;
             opacity: 0.3;
             margin-bottom: 15px;
+            color: #2a5298;
+        }
+
+        .no-results h5 {
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 8px;
+        }
+
+        /* Recent Activity */
+        .activity-list {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: #f8f9fa;
+        }
+
+        .activity-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .activity-icon.success {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            color: #388e3c;
+        }
+
+        .activity-icon.warning {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            color: #f57c00;
+        }
+
+        .activity-icon.danger {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            color: #d32f2f;
+        }
+
+        .activity-details {
+            flex: 1;
+        }
+
+        .activity-details h6 {
+            margin: 0 0 5px 0;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .activity-details p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: #adb5bd;
+        }
+
+        @media (max-width: 1400px) {
+            .applications-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
         }
 
         @media (max-width: 992px) {
@@ -503,6 +853,14 @@
                 margin-left: 70px;
                 width: calc(100% - 70px);
             }
+
+            .applications-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 768px) {
@@ -520,257 +878,451 @@
 
             .top-bar {
                 flex-direction: column;
-                gap: 15px;
             }
 
             .search-container {
                 width: 100%;
             }
 
-            .action-btns {
-                flex-direction: column;
+            .applications-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-stats {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Sidebar navigation links
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = {
+            dashboard: document.getElementById('dashboardSection'),
+            applications: document.getElementById('applicationsSection'),
+            approved: document.getElementById('approvedSection'),
+            rejected: document.getElementById('rejectedSection'),
+            pending: document.getElementById('pendingSection'),
+            analytics: document.getElementById('analyticsSection'),
+            settings: document.getElementById('settingsSection'),
+        };
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function () {
+                // Remove active class from all links and sections
+                navLinks.forEach(l => l.classList.remove('active'));
+                Object.values(sections).forEach(section => section.classList.remove('active'));
+
+                // Set active section and sidebar link
+                this.classList.add('active');
+                const target = this.getAttribute('data-section');
+                if (sections[target]) {
+                    sections[target].classList.add('active');
+                }
+            });
+        });
+    });
+</script>
 <body>
-    <div class="dashboard-wrapper">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo-circle">
-                    <i class="fas fa-building"></i>
-                </div>
-                <h3>Loan Manager</h3>
-                <p>Admin Portal</p>
+<div class="dashboard-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-circle">
+                <i class="fas fa-building"></i>
             </div>
+            <h3>Loan Manager</h3>
+            <p>Admin Portal</p>
+        </div>
 
-            <nav class="sidebar-nav">
-                <div class="nav-item">
-                    <a href="#" class="nav-link active">
-                        <i class="fas fa-home"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-file-invoice-dollar"></i>
-                        <span>Applications</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Approved</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-times-circle"></i>
-                        <span>Rejected</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-clock"></i>
-                        <span>Pending</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Analytics</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-cog"></i>
-                        <span>Settings</span>
-                    </a>
-                </div>
-            </nav>
-
-            <div class="stats-section">
-                <h6>Statistics</h6>
-                <div class="stat-box">
-                    <p class="number">{{ count($loans) }}</p>
-                    <p class="label">Total Applications</p>
-                </div>
-                <div class="stat-box">
-                    <p class="number">{{ collect($loans)->where('status', 'pending')->count() }}</p>
-                    <p class="label">Pending</p>
-                </div>
-                <div class="stat-box">
-                    <p class="number">{{ collect($loans)->where('status', 'approved')->count() }}</p>
-                    <p class="label">Approved</p>
-                </div>
-                <div class="stat-box">
-                    <p class="number">{{ collect($loans)->where('status', 'rejected')->count() }}</p>
-                    <p class="label">Rejected</p>
-                </div>
-            </div>
-
-            <div class="logout-section">
-                <a href="{{ url('/logout') }}" class="btn-logout">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+        <nav class="sidebar-nav">
+            <div class="nav-item">
+                <a href="javascript:void(0)" class="nav-link active" data-section="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
                 </a>
             </div>
-        </aside>
+            <div class="nav-item">
+                <a href="javascript:void(0)" class="nav-link" data-section="applications">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>All Applications</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="javascript:void(0)" class="nav-link" data-section="approved">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Approved</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="javascript:void(0)" class="nav-link" data-section="rejected">
+                    <i class="fas fa-times-circle"></i>
+                    <span>Rejected</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="javascript:void(0)" class="nav-link" data-section="pending">
+                    <i class="fas fa-clock"></i>
+                    <span>Pending</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="javascript:void(0)" class="nav-link" data-section="analytics">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="javascript:void(0)" class="nav-link" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </div>
+        </nav>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle"></i> {{ session('success') }}
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
+        <div class="stats-section">
+            <h6>Quick Stats</h6>
+            <div class="stat-box">
+                <p class="number" id="sidebarTotal">{{ count($loans) }}</p>
+                <p class="label">Total Applications</p>
+            </div>
+            <div class="stat-box">
+                <p class="number" id="sidebarPending">{{ collect($loans)->where('status', 'pending')->count() }}</p>
+                <p class="label">Pending</p>
+            </div>
+            <div class="stat-box">
+                <p class="number" id="sidebarApproved">{{ collect($loans)->where('status', 'approved')->count() }}</p>
+                <p class="label">Approved</p>
+            </div>
+            <div class="stat-box">
+                <p class="number" id="sidebarRejected">{{ collect($loans)->where('status', 'rejected')->count() }}</p>
+                <p class="label">Rejected</p>
+            </div>
+        </div>
 
+        <div class="logout-section">
+            <a href="{{ url('/manager/logout') }}" class="btn-logout">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        @endif
+
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="content-section active">
             <div class="top-bar">
-                <h2><i class="fas fa-file-invoice-dollar"></i> Loan Applications</h2>
+                <h2><i class="fas fa-home me-2"></i>Dashboard Overview</h2>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="dashboard-stats">
+                <div class="stat-card total">
+                    <div class="stat-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3>{{ count($loans) }}</h3>
+                        <p>Total Applications</p>
+                    </div>
+                </div>
+
+                <div class="stat-card pending">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3>{{ collect($loans)->where('status', 'pending')->count() }}</h3>
+                        <p>Pending Review</p>
+                    </div>
+                </div>
+
+                <div class="stat-card approved">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3>{{ collect($loans)->where('status', 'approved')->count() }}</h3>
+                        <p>Approved Loans</p>
+                    </div>
+                </div>
+
+                <div class="stat-card rejected">
+                    <div class="stat-icon">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3>{{ collect($loans)->where('status', 'rejected')->count() }}</h3>
+                        <p>Rejected Applications</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <h4><i class="fas fa-chart-pie me-2"></i>Application Status Distribution</h4>
+                    <canvas id="statusChart"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <h4><i class="fas fa-chart-bar me-2"></i>Monthly Applications Trend</h4>
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="activity-list">
+                <h4 style="color: #1e3c72; font-weight: 700; margin-bottom: 20px;">
+                    <i class="fas fa-history me-2"></i>Recent Activity
+                </h4>
+                @foreach($loans->sortByDesc('created_at')->take(5) as $loan)
+                <div class="activity-item">
+                    <div class="activity-icon {{ $loan->status == 'approved' ? 'success' : ($loan->status == 'rejected' ? 'danger' : 'warning') }}">
+                        <i class="fas fa-{{ $loan->status == 'approved' ? 'check-circle' : ($loan->status == 'rejected' ? 'times-circle' : 'clock') }}"></i>
+                    </div>
+                    <div class="activity-details">
+                        <h6>{{ $loan->name }} - Application {{ ucfirst($loan->status) }}</h6>
+                        <p>{{ $loan->occupation }} • Rs. {{ number_format($loan->salary, 2) }}</p>
+                    </div>
+                    <div class="activity-time">{{ $loan->created_at->diffForHumans() }}</div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- All Applications Section -->
+        <div id="applicationsSection" class="content-section">
+            <div class="top-bar">
+                <h2><i class="fas fa-file-invoice-dollar me-2"></i>All Applications</h2>
                 <div class="search-container">
-                    <input type="text" id="searchInput" placeholder="Search by name, email, occupation...">
+                    <input type="text" id="searchAll" placeholder="Search applications...">
                     <i class="fas fa-search"></i>
                 </div>
             </div>
+            <div class="applications-grid" id="allApplicationsGrid">
+                @foreach($loans as $loan)
+                @include('partials.loan-card', ['loan' => $loan])
+                @endforeach
+            </div>
+            <div class="no-results" id="noResultsAll">
+                <i class="fas fa-search-minus"></i>
+                <h5>No applications found</h5>
+                <p>Try different search terms</p>
+            </div>
+        </div>
 
-            <div class="card">
-                <div class="table-responsive">
-                    <table class="table" id="loanTable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Tel</th>
-                                <th>Occupation</th>
-                                <th>Salary</th>
-                                <th>Paysheet</th>
-                                <th>Status</th>
-                                <th>Submitted</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($loans as $loan)
-                                <tr>
-                                    <td><strong>#{{ $loan->id }}</strong></td>
-                                    <td>{{ $loan->name }}</td>
-                                    <td>{{ $loan->email }}</td>
-                                    <td>{{ $loan->tel }}</td>
-                                    <td>{{ $loan->occupation }}</td>
-                                    <td><strong>Rs. {{ number_format($loan->salary, 2) }}</strong></td>
-                                    <td>
-                                        @if($loan->paysheet_uri)
-                                            <div class="btn-group">
-                                                <a href="{{ url('/loan/view-pdf/'.$loan->id) }}" target="_blank" class="btn btn-outline-primary btn-sm">
-                                                    <i class="fas fa-eye"></i> View
-                                                </a>
-                                                <a href="{{ url('/loan/download-pdf/'.$loan->id) }}" class="btn btn-outline-secondary btn-sm">
-                                                    <i class="fas fa-download"></i> Download
-                                                </a>
-                                            </div>
-                                        @else
-                                            <span class="text-muted">No File</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <span class="badge @if($loan->status == 'approved') bg-success @elseif($loan->status == 'rejected') bg-danger @else bg-warning @endif">
-                                            @if($loan->status == 'approved')<i class="fas fa-check"></i>@elseif($loan->status == 'rejected')<i class="fas fa-times"></i>@else<i class="fas fa-clock"></i>@endif
-                                            {{ ucfirst($loan->status) }}
-                                        </span>
-                                    </td>
-                                    <td>{{ $loan->created_at->timezone('Asia/Colombo')->format('Y-m-d H:i') }}</td>
-                                    <td>
-                                        <div class="action-btns">
-                                            <a href="{{ url('/loan/approve/'.$loan->id) }}" class="btn btn-success btn-sm">
-                                                <i class="fas fa-check"></i> Approve
-                                            </a>
-                                            <a href="{{ url('/loan/reject/'.$loan->id) }}" class="btn btn-danger btn-sm">
-                                                <i class="fas fa-times"></i> Reject
-                                            </a>
-                                           <a href="{{ route('loan.edit', $loan->id) }}" class="btn btn-warning btn-sm">
-                                            <i class="fas fa-edit"></i> Edit
-                                            </a>
-                                            <a href="javascript:void(0)"
-                                               onclick="confirmDelete({{ $loan->id }})" class="btn btn-info btn-sm">
-                                                <i class="fas fa-trash"></i> Delete
-                                            </a>
-
-<!-- Hidden form for deletion -->
-<form id="delete-form-{{ $loan->id }}" action="{{ route('loan.delete', $loan->id) }}" method="POST" style="display:none;">
-    @csrf
-    @method('DELETE')
-</form>
-
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                <div class="no-results" id="noResults">
+        <!-- Approved Section -->
+        <div id="approvedSection" class="content-section">
+            <div class="top-bar">
+                <h2><i class="fas fa-check-circle me-2"></i>Approved Applications</h2>
+                <div class="search-container">
+                    <input type="text" id="searchApproved" placeholder="Search approved applications...">
                     <i class="fas fa-search"></i>
-                    <h5>No results found</h5>
-                    <p>Try different search terms</p>
                 </div>
             </div>
-        </main>
-    </div>
+            <div class="applications-grid" id="approvedApplicationsGrid">
+                @foreach($loans->where('status', 'approved') as $loan)
+                @include('partials.loan-card', ['loan' => $loan])
+                @endforeach
+            </div>
+            <div class="no-results" id="noResultsApproved" style="{{ $loans->where('status', 'approved')->count() == 0 ? 'display: block;' : '' }}">
+                <i class="fas fa-search-minus"></i>
+                <h5>No approved applications found</h5>
+                <p>Approved applications will appear here</p>
+            </div>
+        </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('keyup', function() {
-            const searchValue = this.value.toLowerCase().trim();
-            const table = document.getElementById('loanTable');
-            const tbody = table.getElementsByTagName('tbody')[0];
-            const rows = tbody.getElementsByTagName('tr');
-            const noResults = document.getElementById('noResults');
-            let visibleCount = 0;
+        <!-- Rejected Section -->
+        <div id="rejectedSection" class="content-section">
+            <div class="top-bar">
+                <h2><i class="fas fa-times-circle me-2"></i>Rejected Applications</h2>
+                <div class="search-container">
+                    <input type="text" id="searchRejected" placeholder="Search rejected applications...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            <div class="applications-grid" id="rejectedApplicationsGrid">
+                @foreach($loans->where('status', 'rejected') as $loan)
+                @include('partials.loan-card', ['loan' => $loan])
+                @endforeach
+            </div>
+            <div class="no-results" id="noResultsRejected" style="{{ $loans->where('status', 'rejected')->count() == 0 ? 'display: block;' : '' }}">
+                <i class="fas fa-search-minus"></i>
+                <h5>No rejected applications found</h5>
+                <p>Rejected applications will appear here</p>
+            </div>
+        </div>
 
-            for (let i = 0; i < rows.length; i++) {
-                const row = rows[i];
-                const text = row.textContent.toLowerCase();
+        <!-- Pending Section -->
+        <div id="pendingSection" class="content-section">
+            <div class="top-bar">
+                <h2><i class="fas fa-clock me-2"></i>Pending Applications</h2>
+                <div class="search-container">
+                    <input type="text" id="searchPending" placeholder="Search pending applications...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            <div class="applications-grid" id="pendingApplicationsGrid">
+                @foreach($loans->where('status', 'pending') as $loan)
+                @include('partials.loan-card', ['loan' => $loan])
+                @endforeach
+            </div>
+            <div class="no-results" id="noResultsPending" style="{{ $loans->where('status', 'pending')->count() == 0 ? 'display: block;' : '' }}">
+                <i class="fas fa-search-minus"></i>
+                <h5>No pending applications found</h5>
+                <p>Pending applications will appear here</p>
+            </div>
+        </div>
 
-                if (text.includes(searchValue)) {
-                    row.style.display = '';
-                    visibleCount++;
-                } else {
-                    row.style.display = 'none';
-                }
-            }
+        <!-- Analytics Section -->
+        <div id="analyticsSection" class="content-section">
+            <div class="top-bar">
+                <h2><i class="fas fa-chart-line me-2"></i>Analytics & Reports</h2>
+            </div>
 
-            if (visibleCount === 0 && searchValue !== '') {
-                table.style.display = 'none';
-                noResults.style.display = 'block';
-            } else {
-                table.style.display = 'table';
-                noResults.style.display = 'none';
-            }
-        });
-    </script>
+            <div class="dashboard-stats">
+                <div class="stat-card total">
+                    <div class="stat-icon">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3>{{ count($loans) > 0 ? round((collect($loans)->where('status', 'approved')->count() / count($loans)) * 100, 1) : 0 }}%</h3>
+                        <p>Approval Rate</p>
+                    </div>
+                </div>
 
+                <div class="stat-card approved">
+                    <div class="stat-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3>Rs. {{ count($loans) > 0 ? number_format(collect($loans)->avg('salary'), 0) : 0 }}</h3>
+                        <p>Average Salary</p>
+                    </div>
+                </div>
 
-    <script>
-    function confirmDelete(id) {
-        Swal.fire({
-            title: "Are you sure?",
-            text: "This application will be permanently deleted!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Yes, delete it!",
-            cancelButtonText: "Cancel"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('delete-form-' + id).submit();
-            }
-        });
-    }
-</script>
+                <div class="stat-card pending">
+                    <div class="stat-icon">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3>2.5 days</h3>
+                        <p>Avg. Process Time</p>
+                    </div>
+                </div>
 
+                <div class="stat-card rejected">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3>{{ count($loans) > 0 ? round((collect($loans)->where('status', 'rejected')->count() / count($loans)) * 100, 1) : 0 }}%</h3>
+                        <p>Rejection Rate</p>
+                    </div>
+                </div>
+            </div>
 
+            <div class="charts-section">
+                <div class="chart-card">
+                    <h4><i class="fas fa-briefcase me-2"></i>Applications by Occupation</h4>
+                    <canvas id="occupationChart"></canvas>
+                </div>
 
-</body>
-</html>
+                <div class="chart-card">
+                    <h4><i class="fas fa-money-bill-wave me-2"></i>Salary Distribution</h4>
+                    <canvas id="salaryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="settingsSection" class="content-section">
+            <div class="top-bar">
+                <h2><i class="fas fa-cog me-2"></i>Settings & Configuration</h2>
+            </div>
+
+            <div class="activity-list">
+                <h4 style="color: #1e3c72; font-weight: 700; margin-bottom: 20px;">
+                    <i class="fas fa-sliders-h me-2"></i>System Settings
+                </h4>
+
+                <div class="activity-item">
+                    <div class="activity-icon success">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="activity-details">
+                        <h6>Email Notifications</h6>
+                        <p>Manage email alerts for new applications and status changes</p>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" checked style="width: 3rem; height: 1.5rem;">
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon warning">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="activity-details">
+                        <h6>Two-Factor Authentication</h6>
+                        <p>Enhance security with 2FA for admin access</p>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" style="width: 3rem; height: 1.5rem;">
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon danger">
+                        <i class="fas fa-file-export"></i>
+                    </div>
+                    <div class="activity-details">
+                        <h6>Export Data</h6>
+                        <p>Download all application data in CSV or Excel format</p>
+                    </div>
+                    <button class="btn btn-outline-primary">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon success">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="activity-details">
+                        <h6>Data Backup</h6>
+                        <p>Create a backup of all system data</p>
+                    </div>
+                    <button class="btn btn-outline-primary">
+                        <i class="fas fa-save"></i> Backup
+                    </button>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon warning">
+                        <i class="fas fa-user-cog"></i>
+                    </div>
+                    <div class="activity-details">
+                        <h6>User Management</h6>
+                        <p>Manage admin users and permissions</p>
+                    </div>
+                    <button class="btn btn-outline-primary">
+                        <i class="fas fa-users"></i> Manage
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
