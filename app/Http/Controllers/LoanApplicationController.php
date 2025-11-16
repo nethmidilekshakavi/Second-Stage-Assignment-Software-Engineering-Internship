@@ -55,13 +55,13 @@ class LoanApplicationController extends Controller
     public function viewPdf($id)
     {
         $loan = LoanApplication::findOrFail($id);
-        
+
         if (!$loan->paysheet_uri) {
             abort(404, 'File not found');
         }
 
         $filePath = storage_path('app/public/' . $loan->paysheet_uri);
-        
+
         if (!file_exists($filePath)) {
             abort(404, 'File not found');
         }
@@ -75,7 +75,7 @@ class LoanApplicationController extends Controller
     public function downloadPdf($id)
     {
         $loan = LoanApplication::findOrFail($id);
-        
+
         if (!$loan->paysheet_uri) {
             abort(404, 'File not found');
         }
@@ -88,7 +88,7 @@ class LoanApplicationController extends Controller
     {
         $loan = LoanApplication::findOrFail($id);
         $loan->update(['status' => 'approved']);
-        
+
         return redirect()->back()->with('success', 'Loan application approved!');
     }
 
@@ -97,7 +97,7 @@ class LoanApplicationController extends Controller
     {
         $loan = LoanApplication::findOrFail($id);
         $loan->update(['status' => 'rejected']);
-        
+
         return redirect()->back()->with('success', 'Loan application rejected!');
     }
 
@@ -158,5 +158,8 @@ public function destroy($id)
 
     return redirect()->back()->with('success', 'Loan application deleted successfully!');
 }
+
+
+
 
 }

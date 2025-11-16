@@ -427,7 +427,7 @@
             <!-- Right Side - Login Form -->
             <div class="right-side">
                 <div class="login-header">
-                    <h2>Manager Login</h2>
+                    <h2>Login to LoanApp</h2>
                     <p>Enter your credentials to access the dashboard</p>
                 </div>
 
@@ -439,36 +439,36 @@
 
                 <form action="{{ url('/login') }}" method="POST">
                     @csrf
-                    
+
                     <div class="form-group">
-                        <label for="username" class="form-label">
-                            <i class="fas fa-user"></i> Username
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i> Email Address
                         </label>
                         <div class="input-wrapper">
-                            <i class="fas fa-user input-icon"></i>
-                            <input 
-                                type="text" 
-                                name="username" 
-                                id="username" 
-                                class="form-control" 
-                                placeholder="Enter your username"
+                            <i class="fas fa-envelope input-icon"></i>
+                            <!-- Use email instead of username -->
+                            <input
+                                type="email"
+                                name="email"
+                                id="email"
+                                class="form-control"
+                                placeholder="Enter your email"
                                 required
-                                autocomplete="username"
+                                autocomplete="email"
                             >
                         </div>
                     </div>
-
                     <div class="form-group">
                         <label for="password" class="form-label">
                             <i class="fas fa-lock"></i> Password
                         </label>
                         <div class="input-wrapper">
                             <i class="fas fa-lock input-icon"></i>
-                            <input 
-                                type="password" 
-                                name="password" 
-                                id="password" 
-                                class="form-control" 
+                            <input
+                                type="password"
+                                name="password"
+                                id="password"
+                                class="form-control"
                                 placeholder="Enter your password"
                                 required
                                 autocomplete="current-password"
@@ -476,7 +476,6 @@
                             <i class="fas fa-eye password-toggle" onclick="togglePassword()"></i>
                         </div>
                     </div>
-
                     <div class="remember-forgot">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="remember" name="remember">
@@ -496,11 +495,10 @@
                     <span>OR</span>
                 </div>
 
-                <a href="{{ route('loan.apply') }}" class="btn-apply">
-                    <i class="fas fa-file-invoice-dollar"></i>
-                    Apply for a Loan
+                <a href="{{ route('register') }}" class="btn-apply"">
+                    <i class="fas fa-user-plus"></i>
+                    Create New Account
                 </a>
-
                 <div class="security-badge">
                     <i class="fas fa-lock"></i> Secured with 256-bit SSL encryption
                 </div>
@@ -512,7 +510,7 @@
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const toggleIcon = document.querySelector('.password-toggle');
-            
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 toggleIcon.classList.remove('fa-eye');
@@ -532,7 +530,7 @@
                     group.style.opacity = '0';
                     group.style.transform = 'translateY(20px)';
                     group.style.transition = 'all 0.5s ease';
-                    
+
                     setTimeout(() => {
                         group.style.opacity = '1';
                         group.style.transform = 'translateY(0)';

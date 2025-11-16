@@ -692,11 +692,10 @@
                                            <a href="{{ route('loan.edit', $loan->id) }}" class="btn btn-warning btn-sm">
                                             <i class="fas fa-edit"></i> Edit
                                             </a>
-                                            <a href="javascript:void(0)" 
-   onclick="confirmDelete({{ $loan->id }})" 
-   class="btn btn-info btn-sm">
-   <i class="fas fa-trash"></i> Delete
-</a>
+                                            <a href="javascript:void(0)"
+                                               onclick="confirmDelete({{ $loan->id }})" class="btn btn-info btn-sm">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </a>
 
 <!-- Hidden form for deletion -->
 <form id="delete-form-{{ $loan->id }}" action="{{ route('loan.delete', $loan->id) }}" method="POST" style="display:none;">
@@ -730,11 +729,11 @@
             const rows = tbody.getElementsByTagName('tr');
             const noResults = document.getElementById('noResults');
             let visibleCount = 0;
-            
+
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
                 const text = row.textContent.toLowerCase();
-                
+
                 if (text.includes(searchValue)) {
                     row.style.display = '';
                     visibleCount++;
@@ -742,7 +741,7 @@
                     row.style.display = 'none';
                 }
             }
-            
+
             if (visibleCount === 0 && searchValue !== '') {
                 table.style.display = 'none';
                 noResults.style.display = 'block';
@@ -752,7 +751,7 @@
             }
         });
     </script>
-    
+
 
     <script>
     function confirmDelete(id) {
