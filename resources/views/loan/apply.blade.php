@@ -520,305 +520,199 @@
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <!-- Header Section -->
-        <div class="header-section">
-            <div class="logo-icon">
-                <i class="fas fa-file-invoice-dollar"></i>
-            </div>
-            <h1>Loan Application</h1>
-            <p>Complete your application in just a few minutes</p>
-        </div>
-
-        <!-- Feature Cards -->
-        <div class="feature-cards">
-            <div class="feature-card">
-                <i class="fas fa-clock"></i>
-                <h4>Quick Process</h4>
-                <p>Complete in 5 minutes</p>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-shield-alt"></i>
-                <h4>Secure & Safe</h4>
-                <p>Your data is protected</p>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-check-circle"></i>
-                <h4>Fast Approval</h4>
-                <p>Get response in 24 hours</p>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-headset"></i>
-                <h4>24/7 Support</h4>
-                <p>We're here to help</p>
-            </div>
-        </div>
-
-        <!-- Form Card -->
-        <div class="form-card">
-            <div class="form-header">
-                <h2>Loan Application Form</h2>
-                <p>Please fill in all required information accurately</p>
-            </div>
-
-            <!-- Progress Steps -->
-            <div class="progress-steps">
-                <div class="step active">
-                    <div class="step-circle">1</div>
-                    <div class="step-label">Application</div>
-                </div>
-                <div class="step">
-                    <div class="step-circle">2</div>
-                    <div class="step-label">Verification</div>
-                </div>
-                <div class="step">
-                    <div class="step-circle">3</div>
-                    <div class="step-label">Approval</div>
-                </div>
-                <div class="step">
-                    <div class="step-circle">4</div>
-                    <div class="step-label">Disbursement</div>
-                </div>
-            </div>
-
-            <!-- Alerts -->
-            @if(session('success'))
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i> {{ session('success') }}
-                </div>
-            @endif
-
-            @if($errors->any())
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-circle"></i> <strong>Please fix the following errors:</strong>
-                    <ul>
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            <!-- Info Box -->
-            <div class="info-box">
-                <h5>
-                    <i class="fas fa-info-circle"></i>
-                    Required Documents
-                </h5>
-                <ul>
-                    <li>Valid email address for communication</li>
-                    <li>Current employment details</li>
-                    <li>Latest salary information</li>
-                    <li>Recent paysheet (PDF format)</li>
-                </ul>
-            </div>
-
-            <!-- Application Form -->
-            <form action="{{ route('loan.store') }}" method="POST" enctype="multipart/form-data" id="loanForm">
-                @csrf
-
-                <!-- Personal Information -->
-                <div class="form-section">
-                    <div class="section-title">
-                        <i class="fas fa-user"></i>
-                        Personal Information
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <label for="name" class="form-label">
-                                <i class="fas fa-id-card"></i> Full Name <span class="required">*</span>
-                            </label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-user input-icon"></i>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    id="name"
-                                    class="form-control"
-                                    placeholder="Enter your full name"
-                                    value="{{ old('name') }}"
-                                    required
-                                >
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="email" class="form-label">
-                                <i class="fas fa-envelope"></i> Email Address <span class="required">*</span>
-                            </label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-envelope input-icon"></i>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    id="email"
-                                    class="form-control"
-                                    placeholder="your.email@example.com"
-                                    value="{{ old('email') }}"
-                                    required
-                                >
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label for="tel" class="form-label">
-                                <i class="fas fa-phone"></i> Telephone <span class="required">*</span>
-                            </label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-phone input-icon"></i>
-                                <input
-                                    type="text"
-                                    name="tel"
-                                    id="tel"
-                                    class="form-control"
-                                    placeholder="+94 XX XXX XXXX"
-                                    value="{{ old('tel') }}"
-                                    required
-                                >
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Employment Information -->
-                <div class="form-section">
-                    <div class="section-title">
-                        <i class="fas fa-briefcase"></i>
-                        Employment Details
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="occupation" class="form-label">
-                                <i class="fas fa-building"></i> Occupation <span class="required">*</span>
-                            </label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-briefcase input-icon"></i>
-                                <input
-                                    type="text"
-                                    name="occupation"
-                                    id="occupation"
-                                    class="form-control"
-                                    placeholder="e.g. Software Engineer"
-                                    value="{{ old('occupation') }}"
-                                    required
-                                >
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label for="salary" class="form-label">
-                                <i class="fas fa-money-bill-wave"></i> Monthly Salary (LKR) <span class="required">*</span>
-                            </label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-rupee-sign input-icon"></i>
-                                <input
-                                    type="number"
-                                    name="salary"
-                                    id="salary"
-                                    class="form-control"
-                                    placeholder="e.g. 50000"
-                                    value="{{ old('salary') }}"
-                                    min="0"
-                                    required
-                                >
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Document Upload -->
-                <div class="form-section">
-                    <div class="section-title">
-                        <i class="fas fa-file-upload"></i>
-                        Document Upload
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="paysheet_uri" class="form-label">
-                            <i class="fas fa-file-pdf"></i> Paysheet Document (PDF)
-                        </label>
-                        <div class="file-upload-wrapper">
-                            <input
-                                type="file"
-                                name="paysheet_uri"
-                                id="paysheet_uri"
-                                accept="application/pdf"
-                                onchange="updateFileName(this)"
-                            >
-                            <label for="paysheet_uri" class="file-upload-label">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <div class="file-info">
-                                    <strong>Click to upload or drag and drop</strong>
-                                    <small>PDF format only (Max 5MB)</small>
-                                </div>
-                            </label>
-                        </div>
-                        <div class="file-name" id="fileName"></div>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="button-group">
-                    <a href="{{ url('/') }}" class="btn-back">
-                        <i class="fas fa-arrow-left"></i> Back to Home
-                    </a>
-
-                    <button type="submit" class="btn-submit">
-                        <i class="fas fa-paper-plane"></i> Submit Application
-                    </button>
-                </div>
-            </form>
-        </div>
+<div class="main-container">
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="logo-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+        <h1>Loan Application</h1>
+        <p>Complete your application in just a few minutes</p>
     </div>
 
-    <script>
-        function updateFileName(input) {
-            const fileNameDiv = document.getElementById('fileName');
-            if (input.files && input.files[0]) {
-                const fileName = input.files[0].name;
-                fileNameDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${fileName}`;
-                fileNameDiv.style.display = 'block';
-            } else {
-                fileNameDiv.style.display = 'none';
-            }
+    <!-- Feature Cards -->
+    <div class="feature-cards">
+        <div class="feature-card"><i class="fas fa-clock"></i><h4>Quick Process</h4><p>Complete in 5 minutes</p></div>
+        <div class="feature-card"><i class="fas fa-shield-alt"></i><h4>Secure & Safe</h4><p>Your data is protected</p></div>
+        <div class="feature-card"><i class="fas fa-check-circle"></i><h4>Fast Approval</h4><p>Get response in 24 hours</p></div>
+        <div class="feature-card"><i class="fas fa-headset"></i><h4>24/7 Support</h4><p>We're here to help</p></div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card">
+        <div class="form-header">
+            <h2>Loan Application Form</h2>
+            <p>Please fill in all required information accurately</p>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="step active"><div class="step-circle">1</div><div class="step-label">Application</div></div>
+            <div class="step"><div class="step-circle">2</div><div class="step-label">Verification</div></div>
+            <div class="step"><div class="step-circle">3</div><div class="step-label">Approval</div></div>
+            <div class="step"><div class="step-circle">4</div><div class="step-label">Disbursement</div></div>
+        </div>
+
+        <!-- Alerts -->
+        @if(session('success'))
+        <div class="alert alert-success"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
+        @endif
+        @if($errors->any())
+        <div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> <strong>Please fix the following errors:</strong>
+            <ul>
+                @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <h5><i class="fas fa-info-circle"></i>Required Documents</h5>
+            <ul>
+                <li>Valid email address for communication</li>
+                <li>Current employment details</li>
+                <li>Latest salary information</li>
+                <li>Recent paysheet (PDF format)</li>
+            </ul>
+        </div>
+
+        <!-- Application Form -->
+        <form action="{{ route('loan.store') }}" method="POST" enctype="multipart/form-data" id="loanForm">
+            @csrf
+
+            <!-- Personal Information -->
+            <div class="form-section">
+                <div class="section-title"><i class="fas fa-user"></i>Personal Information</div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="name" class="form-label"><i class="fas fa-id-card"></i> Full Name <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user input-icon"></i>
+                            @auth
+                            <input type="text" name="name" id="name" class="form-control" placeholder="Enter your full name" value="{{ old('name', auth()->user()->name) }}" required readonly>
+                            @else
+                            <input type="text" name="name" id="name" class="form-control" placeholder="Enter your full name" value="{{ old('name') }}" required>
+                            @endauth
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="email" class="form-label"><i class="fas fa-envelope"></i> Email Address <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-icon"></i>
+                            @auth
+                            <input type="email" name="email" id="email" class="form-control" placeholder="your.email@example.com" value="{{ old('email', auth()->user()->email) }}" required readonly>
+                            @else
+                            <input type="email" name="email" id="email" class="form-control" placeholder="your.email@example.com" value="{{ old('email') }}" required>
+                            @endauth
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="tel" class="form-label"><i class="fas fa-phone"></i> Telephone <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-phone input-icon"></i>
+                            <input type="text" name="tel" id="tel" class="form-control" placeholder="+94 XX XXX XXXX" value="{{ old('tel') }}" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Employment Information -->
+            <div class="form-section">
+                <div class="section-title"><i class="fas fa-briefcase"></i>Employment Details</div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="occupation" class="form-label"><i class="fas fa-building"></i> Occupation <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-briefcase input-icon"></i>
+                            <input type="text" name="occupation" id="occupation" class="form-control" placeholder="e.g. Software Engineer" value="{{ old('occupation') }}" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="salary" class="form-label"><i class="fas fa-money-bill-wave"></i> Monthly Salary (LKR) <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-rupee-sign input-icon"></i>
+                            <input type="number" name="salary" id="salary" class="form-control" placeholder="e.g. 50000" value="{{ old('salary') }}" min="0" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Upload -->
+            <div class="form-section">
+                <div class="section-title"><i class="fas fa-file-upload"></i>Document Upload</div>
+
+                <div class="mb-3">
+                    <label for="paysheet_uri" class="form-label"><i class="fas fa-file-pdf"></i> Paysheet Document (PDF)</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" name="paysheet_uri" id="paysheet_uri" accept="application/pdf,image/*" onchange="updateFileName(this)">
+                        <label for="paysheet_uri" class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <div class="file-info">
+                                <strong>Click to upload or drag and drop</strong>
+                                <small>PDF or image (Max 5MB)</small>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="file-name" id="fileName"></div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="button-group">
+                <a href="{{ url('/') }}" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Home</a>
+                <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> Submit Application</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function updateFileName(input) {
+        const fileNameDiv = document.getElementById('fileName');
+        if (input.files && input.files[0]) {
+            const fileName = input.files[0].name;
+            fileNameDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${fileName}`;
+            fileNameDiv.style.display = 'block';
+        } else {
+            fileNameDiv.style.display = 'none';
         }
+    }
 
-        // Form animation on load
-        document.addEventListener('DOMContentLoaded', function() {
-            const formSections = document.querySelectorAll('.form-section');
-            formSections.forEach((section, index) => {
-                section.style.opacity = '0';
-                section.style.transform = 'translateY(20px)';
-                section.style.transition = 'all 0.5s ease';
-
-                setTimeout(() => {
-                    section.style.opacity = '1';
-                    section.style.transform = 'translateY(0)';
-                }, 600 + (index * 150));
-            });
+    // Form animation on load
+    document.addEventListener('DOMContentLoaded', function() {
+        const formSections = document.querySelectorAll('.form-section');
+        formSections.forEach((section, index) => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'all 0.5s ease';
+            setTimeout(() => {
+                section.style.opacity = '1';
+                section.style.transform = 'translateY(0)';
+            }, 600 + (index * 150));
         });
-    </script>
-    <script>
-@if(session('success'))
-    Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: "{{ session('success') }}",
-        confirmButtonColor: '#3085d6',
     });
-@endif
+</script>
 
-@if(session('error'))
-    Swal.fire({
-        icon: 'error',
-        title: 'Oops!',
-        text: "{{ session('error') }}",
-    });
-@endif
+<script>
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: "{{ session('success') }}",
+            confirmButtonColor: '#3085d6',
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({ icon: 'error', title: 'Oops!', text: "{{ session('error') }}" });
+    @endif
 </script>
 </body>
 </html>

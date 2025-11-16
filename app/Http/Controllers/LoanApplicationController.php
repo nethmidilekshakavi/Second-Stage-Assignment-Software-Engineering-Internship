@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\LoanApplication;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class LoanApplicationController extends Controller
 {
@@ -17,23 +18,43 @@ class LoanApplicationController extends Controller
     // Store Loan Application
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+        // Build rules dynamically: if user is logged in we can skip name/email required inputs
+        $rules = [
             'tel' => 'required|string|max:15',
             'occupation' => 'required|string|max:255',
             'salary' => 'required|numeric|min:0',
-            'paysheet_uri' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
-        ]);
+            'paysheet_uri' => 'nullable|mimes:pdf,jpg,jpeg,png|max:5120', // 5MB
+        ];
+
+        if (!Auth::check()) {
+            // for guests require name/email so we can still create a record
+            $rules['name'] = 'required|string|max:255';
+            $rules['email'] = 'required|email|max:255';
+        }
+
+        $request->validate($rules);
+
+        // If user is authenticated, prefer their stored name/email and attach user_id
+        $userId = null;
+        if (Auth::check()) {
+            $user = Auth::user();
+            $name = $user->name;
+            $email = $user->email;
+            $userId = $user->id;
+        } else {
+            $name = $request->name;
+            $email = $request->email;
+        }
 
         $filePath = null;
-        if($request->hasFile('paysheet_uri')){
+        if ($request->hasFile('paysheet_uri')) {
             $filePath = $request->file('paysheet_uri')->store('paysheets', 'public');
         }
 
         LoanApplication::create([
-            'name' => $request->name,
-            'email' => $request->email,
+            'user_id' => $userId,
+            'name' => $name,
+            'email' => $email,
             'tel' => $request->tel,
             'occupation' => $request->occupation,
             'salary' => $request->salary,
@@ -47,6 +68,7 @@ class LoanApplicationController extends Controller
     // List all loans
     public function index()
     {
+        // Consider scoping to the current user for non-admins (not implemented here)
         $loans = LoanApplication::all();
         return view('dashboard', compact('loans'));
     }
@@ -61,14 +83,11 @@ class LoanApplicationController extends Controller
         }
 
         $filePath = storage_path('app/public/' . $loan->paysheet_uri);
-
         if (!file_exists($filePath)) {
             abort(404, 'File not found');
         }
 
-        return response()->file($filePath, [
-            'Content-Type' => 'application/pdf',
-        ]);
+        return response()->file($filePath, ['Content-Type' => 'application/pdf']);
     }
 
     // Download PDF file
@@ -101,8 +120,7 @@ class LoanApplicationController extends Controller
         return redirect()->back()->with('success', 'Loan application rejected!');
     }
 
-
-// Update Loan Application
+    // Update Loan Application
     public function edit($id)
     {
         $loan = LoanApplication::findOrFail($id);
@@ -117,7 +135,7 @@ class LoanApplicationController extends Controller
             'tel' => 'required|string|max:15',
             'occupation' => 'required|string|max:255',
             'salary' => 'required|numeric|min:0',
-            'paysheet_uri' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
+            'paysheet_uri' => 'nullable|mimes:pdf,jpg,jpeg,png|max:5120', // 5MB
         ]);
 
         $loan = LoanApplication::findOrFail($id);
@@ -144,7 +162,7 @@ class LoanApplicationController extends Controller
         return redirect()->back()->with('success', 'Loan application updated successfully!');
     }
 
-//delete loan
+    // delete loan
     public function destroy($id)
     {
         $loan = LoanApplication::findOrFail($id);
@@ -158,8 +176,4 @@ class LoanApplicationController extends Controller
 
         return redirect()->back()->with('success', 'Loan application deleted successfully!');
     }
-
-
-
-
 }
