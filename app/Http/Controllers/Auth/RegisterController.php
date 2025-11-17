@@ -32,10 +32,10 @@ class RegisterController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // Image Upload
         $nicFrontPath = $request->file('nic_front_image')->store('nic_images', 'public');
         $nicBackPath = $request->file('nic_back_image')->store('nic_images', 'public');
         $passportPath = $request->file('passport_image')->store('passport_images', 'public');
+
 
         // Create User
         $user = User::create([

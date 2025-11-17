@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
+
     public function showLoginForm()
     {
         return view('login');
@@ -43,6 +44,8 @@ class LoginController extends Controller
             'email' => 'The provided credentials do not match our records.',
         ])->onlyInput('email');
     }
+
+
     public function logout(Request $request)
     {
         Auth::logout();

@@ -645,7 +645,7 @@
         });
     @endif
 
-    // Add stagger animation to cards
+    // Add animation to cards
     document.addEventListener('DOMContentLoaded', function() {
         const actionBtns = document.querySelectorAll('.action-btn');
         actionBtns.forEach((btn, index) => {

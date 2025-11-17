@@ -37,18 +37,13 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Get all loan applications for this user
-     * FIXED: Using email to match with loan_applications table
-     */
+
     public function loanApplications()
     {
         return $this->hasMany(LoanApplication::class, 'email', 'email');
     }
 
-    /**
-     * Get user's role badge color
-     */
+
     public function getRoleBadgeAttribute()
     {
         return match($this->role) {
@@ -58,25 +53,19 @@ class User extends Authenticatable
         };
     }
 
-    /**
-     * Check if user is admin
-     */
+
     public function isAdmin()
     {
         return $this->role === 'admin';
     }
 
-    /**
-     * Check if user is manager
-     */
+
     public function isManager()
     {
         return $this->role === 'manager';
     }
 
-    /**
-     * Check if user is regular user
-     */
+
     public function isUser()
     {
         return $this->role === 'user';

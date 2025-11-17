@@ -18,7 +18,6 @@ class LoanApplicationController extends Controller
     // Store Loan Application
     public function store(Request $request)
     {
-        // Build rules dynamically: if user is logged in we can skip name/email required inputs
         $rules = [
             'tel' => 'required|string|max:15',
             'occupation' => 'required|string|max:255',
@@ -94,6 +93,7 @@ class LoanApplicationController extends Controller
         return Storage::disk('public')->download($loan->paysheet_uri);
     }
 
+
     // Approve loan
     public function approve($id)
     {
@@ -102,6 +102,7 @@ class LoanApplicationController extends Controller
 
         return redirect()->back()->with('success', 'Loan application approved!');
     }
+
 
     // Reject loan
     public function reject($id)
@@ -112,12 +113,14 @@ class LoanApplicationController extends Controller
         return redirect()->back()->with('success', 'Loan application rejected!');
     }
 
+
     // Update Loan Application
     public function edit($id)
     {
         $loan = LoanApplication::findOrFail($id);
         return view('loan.edit', compact('loan'));
     }
+
 
     public function update(Request $request, $id)
     {
@@ -154,6 +157,7 @@ class LoanApplicationController extends Controller
         return redirect()->back()->with('success', 'Loan application updated successfully!');
     }
 
+
     // delete loan
     public function destroy($id)
     {
@@ -175,7 +179,6 @@ class LoanApplicationController extends Controller
     {
         $user = Auth::user();
 
-        // If you want admins to see all applications, add role check here.
         // For now only the logged-in user's loans:
         $loans = LoanApplication::where('user_id', $user->id)
             ->latest()

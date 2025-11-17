@@ -20,9 +20,6 @@ class LoanApplication extends Model
         'status',
     ];
 
-    /**
-     * The user who submitted the application (nullable for guest submissions).
-     */
     public function user()
     {
         return $this->belongsTo(\App\Models\User::class);
