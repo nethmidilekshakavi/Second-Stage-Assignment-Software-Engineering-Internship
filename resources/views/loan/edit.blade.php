@@ -517,7 +517,7 @@
         <div class="form-body">
             @if($errors->any())
                 <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-circle"></i> 
+                    <i class="fas fa-exclamation-circle"></i>
                     <strong>Validation Error!</strong> Please check the form fields.
                     <ul style="margin: 10px 0 0 0; padding-left: 20px;">
                         @foreach($errors->all() as $error)
@@ -553,11 +553,11 @@
                                 </label>
                                 <div class="input-wrapper">
                                     <i class="fas fa-user input-icon"></i>
-                                    <input 
-                                        type="text" 
-                                        name="name" 
-                                        id="name" 
-                                        class="form-control" 
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        id="name"
+                                        class="form-control"
                                         value="{{ old('name', $loan->name) }}"
                                         placeholder="Enter full name"
                                         required
@@ -574,11 +574,11 @@
                                 </label>
                                 <div class="input-wrapper">
                                     <i class="fas fa-envelope input-icon"></i>
-                                    <input 
-                                        type="email" 
-                                        name="email" 
-                                        id="email" 
-                                        class="form-control" 
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        id="email"
+                                        class="form-control"
                                         value="{{ old('email', $loan->email) }}"
                                         placeholder="example@email.com"
                                         required
@@ -597,11 +597,11 @@
                                 </label>
                                 <div class="input-wrapper">
                                     <i class="fas fa-phone input-icon"></i>
-                                    <input 
-                                        type="tel" 
-                                        name="tel" 
-                                        id="tel" 
-                                        class="form-control" 
+                                    <input
+                                        type="tel"
+                                        name="tel"
+                                        id="tel"
+                                        class="form-control"
                                         value="{{ old('tel', $loan->tel) }}"
                                         placeholder="0771234567"
                                         required
@@ -619,11 +619,11 @@
                                 </label>
                                 <div class="input-wrapper">
                                     <i class="fas fa-briefcase input-icon"></i>
-                                    <input 
-                                        type="text" 
-                                        name="occupation" 
-                                        id="occupation" 
-                                        class="form-control" 
+                                    <input
+                                        type="text"
+                                        name="occupation"
+                                        id="occupation"
+                                        class="form-control"
                                         value="{{ old('occupation', $loan->occupation) }}"
                                         placeholder="e.g., Software Engineer"
                                         required
@@ -650,11 +650,11 @@
                                 </label>
                                 <div class="input-wrapper">
                                     <i class="fas fa-rupee-sign input-icon"></i>
-                                    <input 
-                                        type="number" 
-                                        name="salary" 
-                                        id="salary" 
-                                        class="form-control" 
+                                    <input
+                                        type="number"
+                                        name="salary"
+                                        id="salary"
+                                        class="form-control"
                                         value="{{ old('salary', $loan->salary) }}"
                                         placeholder="50000"
                                         min="0"
@@ -672,14 +672,15 @@
                                     <i class="fas fa-flag"></i>
                                     Application Status <span class="required">*</span>
                                 </label>
-                                <div class="input-wrapper">
-                                    <i class="fas fa-flag input-icon"></i>
-                                    <select name="status" id="status" class="form-select" required>
-                                        <option value="pending" {{ old('status', $loan->status) == 'pending' ? 'selected' : '' }}>Pending</option>
-                                        <option value="approved" {{ old('status', $loan->status) == 'approved' ? 'selected' : '' }}>Approved</option>
-                                        <option value="rejected" {{ old('status', $loan->status) == 'rejected' ? 'selected' : '' }}>Rejected</option>
-                                    </select>
-                                </div>
+                                <input readonly
+                                    type="text"
+                                    name="status"
+                                    id="status"
+                                    class="form-control"
+                                    value="{{ old('status', $loan->status) }}"
+                                    placeholder=""
+                                    required
+                                >
                             </div>
                         </div>
                     </div>
@@ -713,10 +714,10 @@
                             Upload New Paysheet (Optional)
                         </label>
                         <div class="file-upload-wrapper">
-                            <input 
-                                type="file" 
-                                name="paysheet" 
-                                id="paysheet" 
+                            <input
+                                type="file"
+                                name="paysheet"
+                                id="paysheet"
                                 accept=".pdf"
                                 onchange="updateFileName(this)"
                             >
@@ -759,7 +760,7 @@
         // Form validation
         document.getElementById('updateForm').addEventListener('submit', function(e) {
     e.preventDefault(); // Normal submit එක stop කරනවා
-    
+
     // Validation
     const salary = document.getElementById('salary').value;
     if (salary < 0) {
@@ -818,6 +819,6 @@
             }
         });
     </script>
-    
+
 </body>
 </html>
