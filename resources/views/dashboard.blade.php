@@ -1326,3 +1326,24 @@
             </div>
         </div>
     </main>
+
+
+    <script>
+        window.confirmDelete = function (id) {
+            if (!id) return;
+            Swal.fire({
+                title: 'Delete application?',
+                text: 'This action cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#dc3545'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('delete-form-' + id);
+                    if (form) form.submit();
+                }
+            });
+        };
+    </script>

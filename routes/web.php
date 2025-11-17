@@ -119,3 +119,5 @@ Route::middleware(['auth'])->group(function () {
 });
 Route::get('/loan/view-pdf/{id}', [LoanApplicationController::class, 'viewPdf'])->name('loan.pdf.view');
 Route::get('/loan/download-pdf/{id}', [LoanApplicationController::class, 'downloadPdf'])->name('loan.pdf.download');
+
+
