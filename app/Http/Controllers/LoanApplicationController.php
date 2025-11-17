@@ -183,4 +183,7 @@ class LoanApplicationController extends Controller
 
         return view('loan.index', compact('loans'));
     }
+
+
+
 }

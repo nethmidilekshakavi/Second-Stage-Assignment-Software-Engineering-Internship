@@ -1,5 +1,7 @@
 {{-- resources/views/partials/loan-card.blade.php --}}
-<div class="application-card" data-search="{{ strtolower($loan->name . ' ' . $loan->email . ' ' . $loan->occupation) }}">
+<div class="application-card"
+     data-email="{{ strtolower($loan->email) }}"
+     data-search="{{ strtolower($loan->name . ' ' . $loan->email . ' ' . $loan->occupation) }}">
     <div class="card-header-custom">
         <div class="applicant-header">
             <div class="applicant-image-wrapper">
@@ -70,10 +72,10 @@
 
     <div class="card-actions">
         @if($loan->status == 'pending')
-        <a href="{{ url('/loan/approve/'.$loan->id) }}" class="btn btn-success">
+        <a href="{{ url('/loan/approve/'.$loan->id) }}" class="btn btn-success btn-approve" data-id="{{ $loan->id }}" data-url="{{ url('/loan/approve/'.$loan->id) }}">
             <i class="fas fa-check"></i> Approve
         </a>
-        <a href="{{ url('/loan/reject/'.$loan->id) }}" class="btn btn-danger">
+        <a href="{{ url('/loan/reject/'.$loan->id) }}" class="btn btn-danger btn-reject" data-id="{{ $loan->id }}" data-url="{{ url('/loan/reject/'.$loan->id) }}">
             <i class="fas fa-times"></i> Reject
         </a>
         @endif
