@@ -1,5 +1,6 @@
 <?php
 
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Middleware\ManagerAuth;
@@ -20,7 +21,6 @@ Route::get('/', function () {
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-
 
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register'])->name('register.submit');
@@ -76,6 +76,27 @@ Route::middleware([ManagerAuth::class])->group(function () {
 // LOAN APPLICATION ROUTES
 // --------------------------------------
 Route::middleware(['auth'])->group(function () {
+    Route::get('/loan/apply', [LoanApplicationController::class, 'create'])->name('loan.apply');
+    Route::post('/loan/apply', [LoanApplicationController::class, 'store'])->name('loan.store');
+    Route::get('/loan/list', [LoanApplicationController::class, 'index'])->name('loan.index');
+    Route::get('/loan/{id}/edit', [LoanApplicationController::class, 'edit'])->name('loan.edit');
+    Route::put('/loan/{id}/update', [LoanApplicationController::class, 'update'])->name('loan.update');
+    Route::delete('/loan/{id}/delete', [LoanApplicationController::class, 'destroy'])->name('loan.delete');
+});
+
+// Public PDF routes
+Route::get('/loan/view-pdf/{id}', [LoanApplicationController::class, 'viewPdf'])->name('loan.pdf.view');
+Route::get('/loan/download-pdf/{id}', [LoanApplicationController::class, 'downloadPdf'])->name('loan.pdf.download');
+
+
+// Optional: View all applications (if needed)
+Route::get('/loan/list', [LoanApplicationController::class, 'index'])->name('loan.index');
+Route::get('/loan/approve/{id}', [LoanApplicationController::class, 'approve']);
+Route::get('/loan/reject/{id}', [LoanApplicationController::class, 'reject']);
+Route::get('/loan/view-pdf/{id}', [LoanApplicationController::class, 'viewPdf']);
+Route::get('/loan/download-pdf/{id}', [LoanApplicationController::class, 'downloadPdf']);
+
+Route::middleware(['auth'])->group(function () {
     // list page (you requested /loan/list in the request)
     Route::get('/loan/list', [LoanApplicationController::class, 'index'])->name('loan.index');
 
@@ -96,16 +117,5 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/loan/{id}/approve', [LoanApplicationController::class, 'approve'])->name('loan.approve');
     Route::post('/loan/{id}/reject', [LoanApplicationController::class, 'reject'])->name('loan.reject');
 });
-// Public PDF routes
 Route::get('/loan/view-pdf/{id}', [LoanApplicationController::class, 'viewPdf'])->name('loan.pdf.view');
 Route::get('/loan/download-pdf/{id}', [LoanApplicationController::class, 'downloadPdf'])->name('loan.pdf.download');
-
-
-// Optional: View all applications (if needed)
-Route::get('/loan/list', [LoanApplicationController::class, 'index'])->name('loan.index');
-Route::get('/loan/approve/{id}', [LoanApplicationController::class, 'approve']);
-Route::get('/loan/reject/{id}', [LoanApplicationController::class, 'reject']);
-Route::get('/loan/view-pdf/{id}', [LoanApplicationController::class, 'viewPdf']);
-Route::get('/loan/download-pdf/{id}', [LoanApplicationController::class, 'downloadPdf']);
-
-// My Applications - only show loans of the authenticated user
